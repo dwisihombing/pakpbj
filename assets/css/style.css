@@ -22,8 +22,8 @@
 body.dark {
     --body-bg: #020617;
     --card-bg: #0f172a;
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
+    --text-main: #f1f5f9; /* Warna teks utama (Terang) */
+    --text-muted: #94a3b8; /* Warna teks keterangan */
     --border: #1e293b;
     
     --sidebar-bg: #0f172a;
@@ -221,4 +221,203 @@ table thead th { position: sticky; top: 0; background: var(--card-bg); z-index: 
     border-color: var(--border) !important;
     color: var(--text-main);
     padding: 1rem;
+}
+
+/* --- FIX TEKS MODE GELAP --- */
+
+body.dark .table {
+    color: var(--text-main) !important;
+}
+
+body.dark .table-light {
+    background-color: #1e293b !important;
+    color: var(--text-main) !important;
+}
+
+body.dark table thead th {
+    background-color: #1e293b !important;
+    color: var(--text-main) !important;
+    border-color: var(--border) !important;
+}
+
+body.dark .list-group-item {
+    color: var(--text-main) !important;
+    border-color: var(--border) !important;
+}
+
+/* Memaksa elemen dengan class bawaan Bootstrap agar ikut terang */
+body.dark .text-dark, 
+body.dark .fw-bold,
+body.dark .col-7 {
+    color: var(--text-main) !important;
+}
+
+body.dark .bg-light {
+    background-color: #1e293b !important;
+}
+
+/* Mengubah warna teks muted agar lebih kontras di background gelap */
+body.dark .text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Pastikan Ikon Sidebar memiliki ukuran dan warna yang benar */
+.nav-link i {
+    font-size: 1.2rem;
+    min-width: 25px; /* Beri ruang agar teks tidak menempel ke ikon */
+    display: inline-block;
+}
+
+/* Warna ikon saat menu aktif (Putih) */
+.nav-link.active i {
+    color: #ffffff !important;
+}
+
+/* Warna ikon saat menu tidak aktif */
+.nav-link i {
+    color: var(--sidebar-text);
+}
+
+
+/* --- LOGIKA LOGO SIDEBAR --- */
+
+/* Sidebar Besar: Tampilkan Teks, Sembunyikan Ikon */
+.logo-text { display: block; }
+.logo-icon { display: none; }
+
+/* Sidebar Kecil: Sembunyikan Teks, Tampilkan Ikon */
+body.collapsed-sidebar .logo-text {
+    display: none !important;
+}
+
+body.collapsed-sidebar .logo-icon {
+    display: block !important;
+}
+
+/* Memastikan transisi sidebar mulus */
+.sidebar-logo-container {
+    height: var(--topbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sidebar-bg);
+    transition: 0.3s;
+}
+
+/* Memastikan warna border logo mengikuti tema */
+.sidebar-logo-container.border-bottom {
+    border-color: var(--border) !important;
+}
+
+
+/* --- FIX TEKS FORMULIR DI MODE GELAP --- */
+
+/* Memaksa judul h3, h6, dan label agar mengikuti tema */
+.page-content h3, 
+.page-content h6, 
+.page-content label {
+    color: var(--text-main);
+    transition: color 0.3s ease;
+}
+
+/* Khusus untuk teks di dalam kartu formulir saat mode gelap */
+body.dark .page-content .card {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+}
+
+body.dark .page-content h3, 
+body.dark .page-content h6 {
+    color: #f1f5f9 !important; /* Putih terang */
+}
+
+body.dark .page-content .text-muted {
+    color: #94a3b8 !important; /* Abu-abu terang agar tetap terbaca */
+}
+
+/* Gaya untuk garis input agar terlihat di mode gelap */
+body.dark .form-control {
+    background-color: transparent !important;
+    color: #f1f5f9 !important;
+    border-bottom: 2px solid #334155 !important;
+}
+
+body.dark .form-control::placeholder {
+    color: #475569;
+}
+
+/* --- GFORM STYLE --- */
+.q-card {
+    border-radius: 8px;
+    border: 1px solid var(--border) !important;
+}
+
+.gform-input {
+    border: none !important;
+    border-bottom: 2px solid #eee !important;
+    border-radius: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-shadow: none !important;
+}
+
+.gform-input:focus {
+    border-bottom: 2px solid #673ab7 !important;
+    background-color: transparent !important;
+}
+
+/* Penyesuaian Mode Gelap */
+body.dark .q-card {
+    background-color: var(--card-bg);
+}
+
+body.dark .gform-input {
+    border-bottom: 2px solid #334155 !important;
+    color: white !important;
+}
+
+body.dark .gform-input:focus {
+    border-bottom: 2px solid #9575cd !important;
+}
+
+body.dark .card-body label {
+    color: #f1f5f9 !important;
+}
+
+
+/* --- FIX DROPDOWN OPTIONS DI MODE GELAP --- */
+
+/* Gaya dasar untuk select/dropdown */
+.form-select, .form-control {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+}
+
+/* Memaksa elemen option di dalam select agar mengikuti tema */
+.form-select option {
+    background-color: #ffffff; /* Default terang */
+    color: #1e293b;
+}
+
+/* Khusus saat MODE GELAP aktif */
+body.dark .form-select,
+body.dark .form-control,
+body.dark .form-select option {
+    background-color: #1e293b !important; /* Biru gelap */
+    color: #f1f5f9 !important; /* Teks putih terang */
+}
+
+/* Menghapus warna biru bawaan sistem saat option di-hover/dipilih (beberapa browser) */
+body.dark .form-select:focus {
+    border-color: #60a5fa !important;
+}
+
+/* Khusus untuk input gaya GForm agar labelnya tetap terang */
+body.dark .q-card label {
+    color: #f1f5f9 !important;
+}
+
+/* Pastikan input placeholder di mode gelap tidak terlalu redup */
+body.dark .form-control::placeholder {
+    color: #64748b !important;
 }

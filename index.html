@@ -14,27 +14,26 @@
 </head>
 <body>
 
-  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar-overlay" onclick="handleSidebarToggle()"></div>
 
   <header class="topbar">
     <div class="d-flex align-items-center h-100">
-        <!-- Tombol Toggle Langsung Menempel di Kiri Topbar -->
         <button class="btn-toggle-custom" onclick="handleSidebarToggle()">
             <i class="bi bi-text-indent-left fs-3"></i>
         </button>
-        
-        <!-- Judul Halaman di Topbar -->
-        <h5 class="ms-3 mb-0 fw-bold d-none d-md-block" style="color: var(--text-main)">Home</h5>
+        <a href="#" class="brand-logo ms-3 text-decoration-none">
+            <span style="color: #16a34a;"> Sistem Informasi PAK UKPBJ BPS</span>
+        </a>
     </div>
 
     <div class="topbar-actions d-flex align-items-center gap-2 pe-3">
-      <select id="langTop" class="form-select form-select-sm border-0 bg-light" onchange="changeLang(this.value)" style="width: auto;">
+      <select id="langTop" class="form-select form-select-sm border-0" onchange="changeLang(this.value)" style="width: auto; cursor: pointer;">
         <option value="id">ID</option>
         <option value="en">EN</option>
       </select>
-      <button class="btn btn-sm btn-light" id="themeBtn" onclick="toggleTheme()">
+      <button class="btn btn-sm btn-light shadow-none" id="themeBtn" onclick="toggleTheme()">
             <i class="bi bi-moon-stars"></i>
-        </button>
+      </button>
 
       <div class="ms-2 border-start ps-3 d-flex align-items-center gap-2">
         <div class="text-end d-none d-md-block">
@@ -50,35 +49,33 @@
   </header>
 
   <aside class="sidebar">
-    <div class="sidebar-logo-container">
-        <div class="logo-full p-3 text-center">
-            <img src="assets/img/logo.png" alt="Logo" style="height: 40px; width: auto;">
-            <span class="ms-2 fw-800 " style="font-size: 1.2rem;">UKPBJ <span class="text-success">BPS</span></span>
-        </div>
-        
-        <!-- Logo Kecil (Muncul saat sidebar ciut) -->
-        <div class="logo-mini p-3 text-center d-none">
-            <img src="assets/img/logo-icon.png" alt="Logo" style="height: 30px;">
-        </div>
+    <div class="sidebar-logo-container border-bottom">
+         <a href="index.html" class="text-decoration-none d-flex align-items-center justify-content-center w-100">
+            <div class="logo-text d-flex align-items-center">
+                <img src="assets/img/logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
+            </div>
+            <div class="logo-icon d-none">
+                <img src="assets/img/logo.png" alt="Logo" style="height: 30px; width: auto;">
+            </div>
+         </a>
     </div>
-
-    <div id="sidebarMenu" class="py-2"></div>
-</aside>
+    <div id="sidebarMenu" class="py-4"></div>
+  </aside>
 
   <main class="main-wrapper">
       <!-- DASHBOARD -->
       <section id="page-dashboard" class="page-content">
           <h3 id="welcomeText" class="fw-800"></h3>
-          <div class="card mt-4 p-5 text-center bg-white border-0 shadow-sm" style="border-radius: 20px;">
+          <div class="card mt-4 p-5 text-center border-0 shadow-sm welcome-banner">
              <i class="bi bi-info-circle display-4 text-primary mb-3"></i>
              <h4>Sistem Informasi PAK PBJ</h4>
              <p class="text-muted">Gunakan menu navigasi Profil di samping untuk melihat data Anda.</p>
           </div>
       </section>
 
-      <!-- PROFILE (Digunakan secara dinamis) -->
+      <!-- PROFILE -->
       <section id="page-profile" class="page-content" style="display:none">
-          <div id="profileDetailArea" style="max-width: 800px; margin: auto;"></div>
+          <div id="profileDetailArea" style="max-width: 850px; margin: auto;"></div>
       </section>
 
       <!-- ANALITIK -->
@@ -99,20 +96,101 @@
 
       <!-- PENGATURAN -->
       <section id="page-pengaturan" class="page-content" style="display:none">
-    <h4 class="fw-800 mb-4">Pengaturan Sistem</h4>
-    <div class="card p-4 shadow-sm" style="max-width: 500px; border-radius: 20px;">
-        <!-- INPUT SHEET ID DIHAPUS KARENA SUDAH AMAN DI BACKEND -->
-        
-        <label class="small fw-bold mb-2">Simulasi Role (Testing)</label>
-        <select id="roleSelect" class="form-select mb-4">
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-        </select>
+        <h4 class="fw-800 mb-4">Pengaturan Sistem</h4>
+        <div class="card p-4 shadow-sm" style="max-width: 500px; border-radius: 20px;">
+            <label class="small fw-bold mb-2">Simulasi Role (Testing)</label>
+            <select id="roleSelect" class="form-select mb-4">
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+            </select>
+            <button class="btn btn-primary w-100 fw-bold py-2 shadow-sm" onclick="saveAdminSettings()">Simpan Perubahan</button>
+        </div>
+      </section>
 
-        <button class="btn btn-primary w-100 fw-bold py-2 shadow-sm" onclick="saveAdminSettings()">Simpan Perubahan</button>
-        <p class="mt-3 small text-muted text-center">Sheet ID sekarang dikelola secara aman oleh Backend API.</p>
-    </div>
-</section>
+      <!-- PAGE: ENTRI DATA (USULAN AK) -->
+      <section id="page-entry" class="page-content" style="display:none">
+        <div class="container py-3" style="max-width: 770px;">
+            <form id="entryForm">
+                <div class="card border-0 shadow-sm mb-3 overflow-hidden" style="border-radius: 10px; border-top: 10px solid #673ab7 !important;">
+                    <div class="card-body p-4 p-md-5">
+                        <h4 class="fw-800 mb-3 mt-2">Usul AK PPBJ Bagian Pengadaan Barang/Jasa 2025</h4>
+                        <p class="text-muted small mb-0">Formulir berikut digunakan untuk pengisian data guna penyusunan Dokumen Angka Kredit JF Pengelola Pengadaan Barang/Jasa (PPBJ) di Bagian Pengadaan Barang/Jasa, BPS yang meliputi:</p>
+                        <p class="text-muted small mb-0">1. Dokumen Konversi;</p>
+                        <p class="text-muted small mb-0">2. Dokumen Akumulasi; dan</p>
+                        <p class="text-muted small mb-0">3. Dokumen Penetapan Angkat Kredit (dalam hal diperlukan).</p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-3 q-card">
+                    <div class="card-body p-4">
+                        <label class="form-label fw-bold mb-3">Nama <span class="text-danger">*</span></label>
+                        <input type="text" id="entNama" class="form-control gform-input" readonly>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-3 q-card">
+                    <div class="card-body p-4">
+                        <label class="form-label fw-bold mb-3">NIP Baru <span class="text-danger">*</span></label>
+                        <input type="text" id="entNip" class="form-control gform-input" placeholder="Jawaban Anda" required>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-3 q-card">
+                    <div class="card-body p-4">
+                        <label class="form-label fw-bold mb-3">Perubahan pangkat/golongan 1 tahun terakhir? <span class="text-danger">*</span></label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="entUbahPangkat" value="Ya" id="upYa" required>
+                            <label class="form-check-label" for="upYa">Ya</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="entUbahPangkat" value="Tidak" id="upTidak">
+                            <label class="form-check-label" for="upTidak">Tidak</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-3 q-card">
+                    <div class="card-body p-4">
+                        <label class="form-label fw-bold mb-3">Sudah memiliki dokumen AK sd. 2024? <span class="text-danger">*</span></label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="entAdaAk" value="Sudah ada" id="akAda" required>
+                            <label class="form-check-label" for="akAda">Sudah ada</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="entAdaAk" value="Belum ada" id="akBelum">
+                            <label class="form-check-label" for="akBelum">Belum ada</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-3 q-card">
+                    <div class="card-body p-4">
+                        <label class="form-label fw-bold mb-3">Predikat Kinerja 2025 <span class="text-danger">*</span></label>
+                        <select id="entPredikat" class="form-select gform-input" required>
+                            <option value="" disabled selected>Pilih</option>
+                            <option value="Sangat Baik">Sangat Baik</option>
+                            <option value="Baik">Baik</option>
+                            <option value="Butuh Perbaikan">Butuh Perbaikan</option>
+                            <option value="Kurang">Kurang</option>
+                            <option value="Sangat Kurang">Sangat Kurang</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-3 q-card">
+                    <div class="card-body p-4">
+                        <label class="form-label fw-bold mb-2">File Evaluasi Kinerja (Link Drive) <span class="text-danger">*</span></label>
+                        <input type="url" id="entLinkFile" class="form-control gform-input" placeholder="https://drive.google.com/..." required>
+                    </div>
+                </div>
+
+                <div class="text-center mb-5 mt-4">
+                    <button type="submit" id="btnSubmitForm" class="btn btn-primary px-5 fw-bold shadow-sm">Submit</button>
+                </div>
+            </form>
+            <div id="entStatus" class="mb-5"></div>
+        </div>
+      </section>
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>

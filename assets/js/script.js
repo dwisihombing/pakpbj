@@ -1,26 +1,30 @@
 /**
- * SCRIPT.JS - CLEAN & SECURE VERSION
+ * SCRIPT.JS - PROYEK PAK PBJ BPS 2026
+ * Fitur: Security API, Multi-language, Theme Support, GForm Style Entry
  */
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwtU6TY5K4Fc_Kt9vRbkwr2P9CKyb5t4GbOf5AVhN5p_rlz3kSK3BbNJxlOOgLhGtWi/exec";
+// 1. DATA PENGGUNA & KONFIGURASI API
 const userData = JSON.parse(sessionStorage.getItem('userData')) || { role: 'User', name: 'Guest', email: '', picture: '' };
+const API_URL = "https://script.google.com/macros/s/AKfycbw_1NwUc_tTksMD9C8ltcF8545KL8weYXXrQB-gS3d3lB8swNRiJieGoAL5e_xDULZu/exec";
 
+// 2. STATE APLIKASI
 let state = {
     role: sessionStorage.getItem('activeRole') || userData.role,
     lang: localStorage.getItem('lang') || 'id',
     theme: localStorage.getItem('theme') || 'light'
 };
 
-let cachedProfileData = null;
+let cachedProfileData = null; // Penyimpanan data agar loading cepat
 
+// 3. KAMUS BAHASA (i18n)
 const i18n = {
     id: { 
-        nav_dash: "Beranda", nav_profile: "Profil", nav_analitik: "Analitik", nav_pengguna: "Pengguna", nav_set: "Pengaturan", 
+        nav_dash: "Beranda", nav_profile: "Profil", nav_analitik: "Analitik", nav_pengguna: "Pengguna", nav_set: "Pengaturan", nav_entry: "Usulan AK",
         sub_pak: "Penetapan Angka Kredit", sub_training: "Pelatihan dan Ujikom", sub_experience: "Pengalaman", 
         welcome: "Selamat Datang", loading: "Memuat data...", dev_mode: "Fitur masih dalam pengembangan", btn_save: "Simpan"
     },
     en: { 
-        nav_dash: "Home", nav_profile: "Profile", nav_analitik: "Analytics", nav_pengguna: "Users", nav_set: "Settings", 
+        nav_dash: "Home", nav_profile: "Profile", nav_analitik: "Analytics", nav_pengguna: "Users", nav_set: "Settings", nav_entry: "Usulan AK",
         sub_pak: "PAK PBJ", sub_training: "Training & Competence", sub_experience: "Experience", 
         welcome: "Welcome", loading: "Fetching data...", dev_mode: "Under development", btn_save: "Save"
     }
@@ -28,43 +32,35 @@ const i18n = {
 
 const t = (k) => i18n[state.lang][k] || k;
 
-// MAPPING KOLOM (Sesuaikan Indexnya A=0, B=1, dst)
+// 4. KONFIGURASI KOLOM GOOGLE SHEET (Mapping Index)
 const customProfileFields = {
     pak: [
-        { idx: 1, label: "Nama Lengkap" },
-        { idx: 3, label: "Nomor Induk Pegawai (NIP)" },
-        { idx: 4, label: "Nomor Karpeg" },
-        { idx: 5, label: "Golongan" },
-        { idx: 6, label: "Pangkat " },
-        { idx: 12, label: "Unit Kerja"},
-        { idx: 13, label: "Jabatan Fungsional" },
-        { idx: 14, label: "Status" },
-        { idx: 19, label: "Pengangkatan" },
-        { idx: 20, label: "Tahun PJL / Penerimaan" },
-        { idx: 21, label: "TMT Jabatan" },
-        { idx: 22, label: "Tanggal Pelantikan" },
+        { idx: 1, label: "Nama Lengkap" }, { idx: 3, label: "NIP" }, { idx: 4, label: "Nomor Karpeg" },
+        { idx: 5, label: "Golongan" }, { idx: 6, label: "Pangkat" }, { idx: 12, label: "Unit Kerja"},
+        { idx: 13, label: "Jabatan Fungsional" }, { idx: 22, label: "Tanggal Pelantikan" }
     ],
     training: [
-        { idx: 23, label: "Nama Pelatihan Teknis" },
-        { idx: 24, label: "Tahun Kelulusan" },
-        { idx: 25, label: "Penyelenggara Diklat" }
+        { section: "Penjenjangan Pertama", fields: [{ idx: 23, label: "Pelatihan" }, { idx: 24, label: "Hasil" }] },
+        { section: "Penjenjangan Muda", fields: [{ idx: 25, label: "Pelatihan" }, { idx: 26, label: "Ujikom" }, { idx: 27, label: "Hasil" }] },
+        { section: "Penjenjangan Madya", fields: [{ idx: 28, label: "Pelatihan" }, { idx: 29, label: "Ujikom" }, { idx: 30, label: "Hasil" }] }
     ],
     experience: [
-        { idx: 23, label: "Nama Paket Pekerjaan" },
-        { idx: 30, label: "Nilai Pagu Anggaran" }
+        { section: "Paket Konstruksi 2022-2024", fields: [{ idx: 23, label: "Seleksi" }, { idx: 24, label: "Tender" }, { idx: 25, label: "Pendampingan" }] },
+        { section: "Portofolio", fields: [{ idx: 26, label: "Portofolio Madya JK" }] }
     ]
 };
 
-// --- INITIALIZATION ---
+// 5. INISIALISASI SAAT START
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Load Sidebar State (Collapsed/Besar)
-    const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-    if (wasCollapsed && window.innerWidth >= 992) {
+    // Cek Sidebar Collapsed State
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (isCollapsed && window.innerWidth >= 992) {
         document.body.classList.add('collapsed-sidebar');
         updateToggleIcon(true);
     }
 
     initApp();
+    setupEntryForm();
 });
 
 function initApp() {
@@ -85,18 +81,25 @@ function initApp() {
     
     showPage('dashboard');
     checkSimulationStatus();
+
+    // Pre-fetch Data Profil di Background
+    if (!cachedProfileData) {
+        fetch(`${API_URL}?action=getProfile&email=${userData.email}`)
+            .then(res => res.json())
+            .then(result => { if (result.status === "success") cachedProfileData = result.data; });
+    }
 }
 
-// --- SIDEBAR & NAVIGASI ---
+// 6. SIDEBAR & NAVIGATION
 function renderSidebar() {
     const menu = document.getElementById('sidebarMenu');
     const isAdmin = state.role === 'Admin';
     menu.innerHTML = `
-        <a class="nav-link" id="nav-dashboard" onclick="showPage('dashboard')"><i class="bi bi-house"></i> <span>${t('nav_dash')}</span></a>
+        <a class="nav-link" id="nav-dashboard" onclick="showPage('dashboard')"><i class="bi bi-house-door-fill"></i> <span>${t('nav_dash')}</span></a>
+        
         <div class="nav-item">
             <a class="nav-link d-flex align-items-center" id="nav-profile" onclick="toggleSub('subProfil')">
-                <i class="bi bi-person-circle"></i> <span>${t('nav_profile')}</span>
-                <i class="bi bi-chevron-down ms-auto small"></i>
+                <i class="bi bi-person-circle"></i> <span>${t('nav_profile')}</span><i class="bi bi-chevron-down ms-auto small"></i>
             </a>
             <div id="subProfil" class="submenu shadow-sm" style="display:none">
                 <a href="javascript:void(0)" id="sub-pak" onclick="loadProfileData('pak')">${t('sub_pak')}</a>
@@ -104,14 +107,124 @@ function renderSidebar() {
                 <a href="javascript:void(0)" id="sub-experience" onclick="loadProfileData('experience')">${t('sub_experience')}</a>
             </div>
         </div>
+
+        <a class="nav-link" id="nav-entry" onclick="showPage('entry')"><i class="bi bi-plus-circle-fill"></i> <span>${t('nav_entry')}</span></a>
+
         ${isAdmin ? `
-            <a class="nav-link" id="nav-analitik" onclick="showAnalitikDev()"><i class="bi bi-bar-chart"></i> <span>${t('nav_analitik')}</span></a>
-            <a class="nav-link" id="nav-pengguna" onclick="showPage('pengguna')"><i class="bi bi-people"></i> <span>${t('nav_pengguna')}</span></a>
-            <a class="nav-link" id="nav-pengaturan" onclick="showPage('pengaturan')"><i class="bi bi-gear"></i> <span>${t('nav_set')}</span></a>
+            <a class="nav-link" id="nav-analitik" onclick="showAnalitikDev()"><i class="bi bi-bar-chart-fill"></i> <span>${t('nav_analitik')}</span></a>
+            <a class="nav-link" id="nav-pengguna" onclick="showPage('pengguna')"><i class="bi bi-people-fill"></i> <span>${t('nav_pengguna')}</span></a>
+            <a class="nav-link" id="nav-pengaturan" onclick="showPage('pengaturan')"><i class="bi bi-gear-fill"></i> <span>${t('nav_set')}</span></a>
         ` : ''}
     `;
 }
 
+// 7. DATA RENDERING (PROFILE)
+async function loadProfileData(type) {
+    showPage('profile');
+    const area = document.getElementById('profileDetailArea');
+    
+    // UI Feedback
+    document.querySelectorAll('.submenu a').forEach(a => a.classList.remove('active'));
+    document.getElementById(`sub-${type}`)?.classList.add('active');
+    document.getElementById('nav-profile').classList.add('active');
+
+    if (!cachedProfileData) {
+        area.innerHTML = `<div class="p-5 text-center"><div class="spinner-border text-primary"></div><p class="mt-2">${t('loading')}</p></div>`;
+        const res = await fetch(`${API_URL}?action=getProfile&email=${userData.email}`);
+        const result = await res.json();
+        if (result.status === "success") cachedProfileData = result.data;
+        else { area.innerHTML = `<div class="alert alert-warning">Data tidak ditemukan.</div>`; return; }
+    }
+    renderProfileUI(type);
+}
+
+function renderProfileUI(type) {
+    const area = document.getElementById('profileDetailArea');
+    const specificData = cachedProfileData[type]; 
+    const d = (specificData && specificData.values) ? specificData.values : [];
+    const fieldsToShow = customProfileFields[type] || [];
+
+    let labelExtra = type === 'training' ? `<div class="p-3 border-bottom"><h6 class="fw-800 mb-0"><i class="bi bi-award-fill me-2 text-success"></i>Keikutsertaan Pelatihan/Ujikom</h6></div>` : "";
+
+    let html = `
+        <div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius:20px;">
+            <div class="card-header bg-primary text-white p-4 border-0">
+                <h5 class="mb-0 fw-bold text-uppercase">${t('sub_' + type)}</h5>
+                <small class="opacity-75">${userData.name}</small>
+            </div>
+            <div class="card-body p-0">${labelExtra}<div class="list-group list-group-flush">`;
+
+    fieldsToShow.forEach(item => {
+        if (item.section) {
+            html += `<div class="bg-light p-2 px-3 fw-bold small text-primary border-bottom border-top" style="letter-spacing:1px; font-size: 11px;">
+                        <i class="bi bi-layers-fill me-1"></i> ${item.section.toUpperCase()}
+                     </div>`;
+            item.fields.forEach(f => { html += renderRow(f.label, d[f.idx]); });
+        } else {
+            html += renderRow(item.label, d[item.idx]);
+        }
+    });
+
+    area.innerHTML = html + `</div></div></div><p class="text-center text-muted small">Update: 2026</p>`;
+}
+
+function renderRow(label, value) {
+    return `<div class="list-group-item p-3 border-light border-0 border-bottom">
+                <div class="row align-items-center">
+                    <!-- Ukuran font label naik ke 13px dan warna lebih terang -->
+                    <div class="col-5 text-muted fw-bold text-uppercase" style="font-size:13px; letter-spacing: 0.5px;">
+                        ${label}
+                    </div>
+                    <!-- Ukuran font isi data naik ke 15px -->
+                    <div class="col-7 fw-bold" style="font-size:15px">
+                        ${value || '-'}
+                    </div>
+                </div>
+            </div>`;
+}
+
+// 8. FORM USULAN AK LOGIC
+function setupEntryForm() {
+    const form = document.getElementById('entryForm');
+    const inputNama = document.getElementById('entNama');
+    if(inputNama) inputNama.value = userData.name;
+
+    if(form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitForm');
+            const statusDiv = document.getElementById('entStatus');
+
+            const dataToSubmit = [
+                new Date().toLocaleString('id-ID'), 
+                userData.email,
+                userData.name,
+                document.getElementById('entNip').value,
+                document.querySelector('input[name="entUbahPangkat"]:checked').value,
+                document.querySelector('input[name="entAdaAk"]:checked').value,
+                document.getElementById('entPredikat').value,
+                document.getElementById('entLinkFile').value
+            ];
+
+            btn.disabled = true;
+            btn.innerHTML = 'Processing...';
+
+            try {
+                const encodedData = encodeURIComponent(JSON.stringify(dataToSubmit));
+                const res = await fetch(`${API_URL}?action=addEntry&sheet=Usulan+AK&data=${encodedData}`);
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    statusDiv.innerHTML = `<div class="card border-0 shadow-sm p-5 text-center mt-3"><i class="bi bi-check-circle-fill fs-1 text-success mb-3"></i><h4>Sukses!</h4><p>Jawaban Anda telah direkam.</p><button onclick="location.reload()" class="btn btn-primary btn-sm px-4">Kirim Lainnya</button></div>`;
+                    form.style.display = 'none';
+                }
+            } catch (err) { alert("Error koneksi."); }
+            finally { btn.disabled = false; btn.innerHTML = 'Submit'; }
+        });
+    }
+}
+
+// 9. SIDEBAR TOGGLE & CORE UTILS
 function handleSidebarToggle() {
     const body = document.body;
     if (window.innerWidth < 992) {
@@ -133,11 +246,8 @@ function showPage(id) {
     document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
     const target = document.getElementById(`page-${id}`);
     if(target) target.style.display = 'block';
-
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    const activeNav = document.getElementById(`nav-${id}`);
-    if(activeNav) activeNav.classList.add('active');
-
+    document.getElementById(`nav-${id}`)?.classList.add('active');
     if(window.innerWidth < 992) document.body.classList.remove('sidebar-open');
 }
 
@@ -146,101 +256,35 @@ function toggleSub(id) {
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
-// --- DATA FETCHING (API) ---
-async function loadProfileData(type) {
-    showPage('profile');
-    const area = document.getElementById('profileDetailArea');
-    
-    document.querySelectorAll('.submenu a').forEach(a => a.classList.remove('active'));
-    const activeSub = document.getElementById(`sub-${type}`);
-    if(activeSub) activeSub.classList.add('active');
-    document.getElementById('nav-profile').classList.add('active');
-
-    if (!cachedProfileData) {
-        area.innerHTML = `<div class="p-5 text-center"><div class="spinner-border text-primary"></div><p class="mt-2">${t('loading')}</p></div>`;
-        try {
-            const res = await fetch(`${API_URL}?action=getProfile&email=${userData.email}`);
-            const result = await res.json();
-            if (result.status === "success") {
-                cachedProfileData = { headers: result.headers, data: result.data };
-            } else {
-                area.innerHTML = `<div class="alert alert-warning">Data email <b>${userData.email}</b> tidak ditemukan.</div>`;
-                return;
-            }
-        } catch (e) {
-            area.innerHTML = `<div class="alert alert-danger">Gagal terhubung ke Server API.</div>`;
-            return;
-        }
-    }
-    renderProfileUI(type);
+function applyTheme() { document.body.classList.toggle('dark', state.theme === 'dark'); }
+function toggleTheme() { 
+    state.theme = state.theme === 'light' ? 'dark' : 'light'; 
+    localStorage.setItem('theme', state.theme); 
+    applyTheme(); 
 }
-
-function renderProfileUI(type) {
-    const area = document.getElementById('profileDetailArea');
-    const d = cachedProfileData.data;
-    const fieldsToShow = customProfileFields[type] || [];
-
-    let html = `
-        <div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius:20px;">
-            <div class="card-header bg-primary text-white p-4 border-0">
-                <h5 class="mb-0 fw-bold text-uppercase">${t('sub_' + type)}</h5>
-                <small class="opacity-75">${userData.name}</small>
-            </div>
-            <div class="list-group list-group-flush bg-white">
-    `;
-
-    fieldsToShow.forEach(field => {
-        const val = d[field.idx] || '-';
-        html += `
-            <div class="list-group-item p-3 border-light">
-                <div class="row align-items-center">
-                    <div class="col-5 text-muted small fw-bold text-uppercase" style="font-size:10px">${field.label}</div>
-                    <div class="col-7 fw-bold" style="font-size:14px">${val}</div>
-                </div>
-            </div>`;
-    });
-
-    area.innerHTML = html + `</div></div><p class="text-center text-muted small">Update: 2026</p>`;
-}
-
-// --- ADMIN & UTILS ---
-async function fetchUsersToTable() {
-    const tbody = document.getElementById('userTableBody');
-    if (!tbody) return;
-    try {
-        const res = await fetch(`${API_URL}?action=getAllUsers`);
-        const result = await res.json();
-        const data = result.data;
-        const h = data[0];
-        tbody.innerHTML = data.slice(1).map(r => `
-            <tr>
-                <td><b>${r[h.indexOf('Nama')]}</b></td>
-                <td>${r[h.indexOf('Email')]}</td>
-                <td><span class="badge-role ${r[h.indexOf('Role')] === 'Admin' ? 'admin-pill' : 'user-pill'}">${r[h.indexOf('Role')]}</span></td>
-            </tr>
-        `).join('');
-    } catch (e) { console.log("Users fetch error"); }
-}
-
-function saveAdminSettings() {
-    sessionStorage.setItem('activeRole', document.getElementById('roleSelect').value);
-    location.reload();
-}
+function changeLang(v) { localStorage.setItem('lang', v); location.reload(); }
+function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
+function saveAdminSettings() { sessionStorage.setItem('activeRole', document.getElementById('roleSelect').value); location.reload(); }
 
 function checkSimulationStatus() {
     const btnBack = document.getElementById('btnBackToAdmin');
     if (userData.role === 'Admin' && state.role === 'User') btnBack.style.display = 'inline-block';
     else if (btnBack) btnBack.style.display = 'none';
 }
+function backToAdmin() { sessionStorage.setItem('activeRole', 'Admin'); location.reload(); }
 
-function backToAdmin() {
-    sessionStorage.setItem('activeRole', 'Admin');
-    location.reload();
+async function fetchUsersToTable() {
+    const tbody = document.getElementById('userTableBody');
+    if (!tbody) return;
+    try {
+        const res = await fetch(`${API_URL}?action=getAllUsers`);
+        const result = await res.json();
+        const h = result.data[0];
+        tbody.innerHTML = result.data.slice(1).map(r => `<tr><td><b>${r[h.indexOf('Nama')]}</b></td><td>${r[h.indexOf('Email')]}</td><td><span class="badge-role ${r[h.indexOf('Role')] === 'Admin' ? 'admin-pill' : 'user-pill'}">${r[h.indexOf('Role')]}</span></td></tr>`).join('');
+    } catch (e) { }
 }
 
-function applyTheme() { document.body.classList.toggle('dark', state.theme === 'dark'); }
-function toggleTheme() { state.theme = state.theme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', state.theme); applyTheme(); }
-function changeLang(v) { localStorage.setItem('lang', v); location.reload(); }
-function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
-function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
-function showAnalitikDev() { showPage('analitik'); document.getElementById('analitikDataDisplay').innerHTML = `<div class="alert alert-info p-5 text-center" style="border-radius:20px"><h4>${t('nav_analitik')}</h4>${t('dev_mode')}</div>`; }
+function showAnalitikDev() { 
+    showPage('analitik'); 
+    document.getElementById('analitikDataDisplay').innerHTML = `<div class="alert alert-info p-5 text-center" style="border-radius:20px"><h4>${t('nav_analitik')}</h4>${t('dev_mode')}</div>`; 
+}
