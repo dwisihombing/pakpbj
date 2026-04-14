@@ -1,0 +1,224 @@
+/* --- 1. SETTING UTAMA & VARIABEL --- */
+:root {
+    --primary: #16a34a; /* Hijau KiPapp */
+    --primary-dark: #15803d;
+    --sidebar-w: 260px;
+    --sidebar-small: 70px;
+    --topbar-h: 64px;
+    
+    /* Warna Mode Terang */
+    --body-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #475569;
+    --sidebar-hover: #f1f5f9;
+}
+
+/* --- 2. TEMA GELAP (Variabel otomatis berubah) --- */
+body.dark {
+    --body-bg: #020617;
+    --card-bg: #0f172a;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: #1e293b;
+    
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #94a3b8;
+    --sidebar-hover: #1e293b;
+}
+
+/* --- 3. RESET & BASE STYLE --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-main);
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+}
+
+.fw-800 { font-weight: 800; }
+
+/* --- 4. TOPBAR (Header Atas) --- */
+.topbar {
+    position: fixed;
+    top: 0; 
+    left: var(--sidebar-w); /* Mulai setelah Sidebar */
+    right: 0;
+    height: var(--topbar-h);
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    z-index: 1050;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animasi ikut bergerak */
+}
+
+/* Tombol Toggle Hijau ala KiPapp */
+.btn-toggle-custom {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    height: var(--topbar-h);
+    width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    cursor: pointer;
+}
+.btn-toggle-custom:hover { background-color: var(--primary-dark); }
+
+.brand-logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); text-decoration: none; }
+
+/* --- 5. SIDEBAR (Menu Samping) --- */
+.sidebar {
+    position: fixed;
+    top: 0; /* Mulai dari paling atas layar */
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    z-index: 1100; /* Lebih tinggi agar rapi */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.nav-label { 
+    font-size: 10px; 
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+    font-weight: 700; 
+    padding: 1.5rem 1.5rem 0.5rem;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.8rem 1.5rem;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.nav-link:hover { background: var(--sidebar-hover); color: var(--primary); }
+
+.nav-link.active { 
+    background: var(--primary) !important; 
+    color: #fff !important;
+    font-weight: 600;
+}
+
+/* Submenu */
+.submenu { 
+    background: rgba(0,0,0,0.03); 
+    margin: 5px 10px; 
+    border-radius: 8px; 
+}
+body.dark .submenu { background: rgba(255,255,255,0.03); }
+
+.submenu a {
+    display: block;
+    padding: 8px 15px 8px 45px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.8rem;
+    border-radius: 5px;
+}
+.submenu a:hover { color: var(--primary); }
+.submenu a.active { background: var(--primary); color: white !important; }
+
+/* --- 6. LOGIKA COLLAPSE (Besar/Kecil Sidebar) --- */
+@media (min-width: 992px) {
+    body.collapsed-sidebar .sidebar { 
+        width: var(--sidebar-small); /* Sidebar jadi 70px */
+    }
+    body.collapsed-sidebar .topbar { 
+        left: var(--sidebar-small); /* Topbar ikut bergeser ke kiri (70px) */
+    }
+    body.collapsed-sidebar .main-wrapper { 
+        margin-left: var(--sidebar-small); 
+    }
+    
+    /* Sembunyikan teks menu saat kecil */
+    body.collapsed-sidebar .sidebar span,
+    body.collapsed-sidebar .sidebar .nav-label,
+    body.collapsed-sidebar .sidebar .bi-chevron-down { 
+        display: none !important; 
+    }
+    body.collapsed-sidebar .nav-link { 
+        justify-content: center; 
+        padding: 1rem 0; 
+    }
+    body.collapsed-sidebar .submenu { 
+        display: none !important; 
+    }
+}
+
+/* --- 7. MOBILE RESPONSIVE --- */
+@media (max-width: 991px) {
+    .sidebar { 
+        transform: translateX(-100%); 
+    }
+    .topbar {
+        left: 0; /* Di mobile topbar kembali penuh ke kiri */
+    }
+    body.sidebar-open .sidebar { 
+        transform: translateX(0); 
+    }
+    .main-wrapper { 
+        margin-left: 0 !important; 
+    }
+}
+/* --- 8. MAIN CONTENT AREA --- */
+.main-wrapper {
+    margin-top: var(--topbar-h);
+    margin-left: var(--sidebar-w);
+    padding: 2rem;
+    transition: all 0.3s ease;
+    min-height: calc(100vh - var(--topbar-h));
+}
+
+/* --- 9. UI COMPONENTS --- */
+.card { 
+    background: var(--card-bg); 
+    border: 1px solid var(--border); 
+    border-radius: 15px; 
+    padding: 1.5rem; 
+}
+
+.badge-role { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.admin-pill { background: #dcfce7; color: #16a34a; }
+.user-pill { background: #f0fdf4; color: #16a34a; }
+
+/* Table Fix */
+.table-container {
+    max-height: 75vh;
+    overflow: auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+table { min-width: 1000px; }
+table thead th { position: sticky; top: 0; background: var(--card-bg); z-index: 5; border-bottom: 2px solid var(--border); }
+
+/* Profile List */
+.list-group-item {
+    background-color: transparent !important;
+    border-color: var(--border) !important;
+    color: var(--text-main);
+    padding: 1rem;
+}

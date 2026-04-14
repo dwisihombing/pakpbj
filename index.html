@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard PAK PBJ</title>
+    <script>
+        if (sessionStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'login.html';
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <header class="topbar">
+    <div class="d-flex align-items-center h-100">
+        <!-- Tombol Toggle Langsung Menempel di Kiri Topbar -->
+        <button class="btn-toggle-custom" onclick="handleSidebarToggle()">
+            <i class="bi bi-text-indent-left fs-3"></i>
+        </button>
+        
+        <!-- Judul Halaman di Topbar -->
+        <h5 class="ms-3 mb-0 fw-bold d-none d-md-block" style="color: var(--text-main)">Home</h5>
+    </div>
+
+    <div class="topbar-actions d-flex align-items-center gap-2 pe-3">
+      <select id="langTop" class="form-select form-select-sm border-0 bg-light" onchange="changeLang(this.value)" style="width: auto;">
+        <option value="id">ID</option>
+        <option value="en">EN</option>
+      </select>
+      <button class="btn btn-sm btn-light" id="themeBtn" onclick="toggleTheme()">
+            <i class="bi bi-moon-stars"></i>
+        </button>
+
+      <div class="ms-2 border-start ps-3 d-flex align-items-center gap-2">
+        <div class="text-end d-none d-md-block">
+            <button id="btnBackToAdmin" class="btn btn-warning btn-sm fw-bold me-2" onclick="backToAdmin()" style="display:none; font-size: 10px;">
+                <i class="bi bi-arrow-left-circle"></i> Back to Admin
+            </button>
+            <div id="topRoleBadge" class="badge-role">Role</div>
+        </div>
+        <img id="userPic" src="" class="rounded-circle d-none d-md-block shadow-sm" style="width:32px; height:32px; border: 2px solid #fff; object-fit: cover;">
+        <button class="btn btn-danger btn-sm rounded-pill px-3 fw-bold" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo-container">
+        <div class="logo-full p-3 text-center">
+            <img src="assets/img/logo.png" alt="Logo" style="height: 40px; width: auto;">
+            <span class="ms-2 fw-800 " style="font-size: 1.2rem;">UKPBJ <span class="text-success">BPS</span></span>
+        </div>
+        
+        <!-- Logo Kecil (Muncul saat sidebar ciut) -->
+        <div class="logo-mini p-3 text-center d-none">
+            <img src="assets/img/logo-icon.png" alt="Logo" style="height: 30px;">
+        </div>
+    </div>
+
+    <div id="sidebarMenu" class="py-2"></div>
+</aside>
+
+  <main class="main-wrapper">
+      <!-- DASHBOARD -->
+      <section id="page-dashboard" class="page-content">
+          <h3 id="welcomeText" class="fw-800"></h3>
+          <div class="card mt-4 p-5 text-center bg-white border-0 shadow-sm" style="border-radius: 20px;">
+             <i class="bi bi-info-circle display-4 text-primary mb-3"></i>
+             <h4>Sistem Informasi PAK PBJ</h4>
+             <p class="text-muted">Gunakan menu navigasi Profil di samping untuk melihat data Anda.</p>
+          </div>
+      </section>
+
+      <!-- PROFILE (Digunakan secara dinamis) -->
+      <section id="page-profile" class="page-content" style="display:none">
+          <div id="profileDetailArea" style="max-width: 800px; margin: auto;"></div>
+      </section>
+
+      <!-- ANALITIK -->
+      <section id="page-analitik" class="page-content" style="display:none">
+          <div id="analitikDataDisplay"></div>
+      </section>
+
+      <!-- PENGGUNA -->
+      <section id="page-pengguna" class="page-content" style="display:none">
+          <h4 class="fw-800 mb-4">Daftar Pengguna</h4>
+          <div class="table-responsive card border-0 shadow-sm">
+              <table class="table mb-0">
+                  <thead class="table-light"><tr><th>Nama</th><th>Email</th><th>Role</th></tr></thead>
+                  <tbody id="userTableBody"></tbody>
+              </table>
+          </div>
+      </section>
+
+      <!-- PENGATURAN -->
+      <section id="page-pengaturan" class="page-content" style="display:none">
+    <h4 class="fw-800 mb-4">Pengaturan Sistem</h4>
+    <div class="card p-4 shadow-sm" style="max-width: 500px; border-radius: 20px;">
+        <!-- INPUT SHEET ID DIHAPUS KARENA SUDAH AMAN DI BACKEND -->
+        
+        <label class="small fw-bold mb-2">Simulasi Role (Testing)</label>
+        <select id="roleSelect" class="form-select mb-4">
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+        </select>
+
+        <button class="btn btn-primary w-100 fw-bold py-2 shadow-sm" onclick="saveAdminSettings()">Simpan Perubahan</button>
+        <p class="mt-3 small text-muted text-center">Sheet ID sekarang dikelola secara aman oleh Backend API.</p>
+    </div>
+</section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/script.js"></script>
+</body>
+</html>
