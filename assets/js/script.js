@@ -153,7 +153,7 @@ function renderProfileUI(type) {
     const d = (specificData && specificData.values) ? specificData.values : [];
     const fieldsToShow = customProfileFields[type] || [];
 
-    let labelExtra = type === 'training' ? `<div class="p-3 border-bottom"><h6 class="fw-800 mb-0"><i class="bi bi-award-fill me-2 text-success"></i>Keikutsertaan Pelatihan/Ujikom</h6></div>` : "";
+    let labelExtra = type === 'training' ? `<div class="p-3 border-bottom"><h6 class="fw-800 mb-0"><i class="bi bi-award-fill me-2 text-success"></i>Keikutsertaan Pelatihan dan Uji Kompetensi</h6></div>` : "";
 
     let html = `
         <div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius:20px;">
