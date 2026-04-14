@@ -5,7 +5,7 @@
 
 // 1. DATA PENGGUNA & KONFIGURASI API
 const userData = JSON.parse(sessionStorage.getItem('userData')) || { role: 'User', name: 'Guest', email: '', picture: '' };
-const API_URL = "https://script.google.com/macros/s/AKfycbw_1NwUc_tTksMD9C8ltcF8545KL8weYXXrQB-gS3d3lB8swNRiJieGoAL5e_xDULZu/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbysA8l0_2ooZ2DxYdvmOQH9W2MvfuqvynPI_ExvaE6RtMXbU3NPdKuTrQUdrhaqxu8u/exec";
 
 // 2. STATE APLIKASI
 let state = {
@@ -35,9 +35,18 @@ const t = (k) => i18n[state.lang][k] || k;
 // 4. KONFIGURASI KOLOM GOOGLE SHEET (Mapping Index)
 const customProfileFields = {
     pak: [
-        { idx: 1, label: "Nama Lengkap" }, { idx: 3, label: "NIP" }, { idx: 4, label: "Nomor Karpeg" },
-        { idx: 5, label: "Golongan" }, { idx: 6, label: "Pangkat" }, { idx: 12, label: "Unit Kerja"},
-        { idx: 13, label: "Jabatan Fungsional" }, { idx: 22, label: "Tanggal Pelantikan" }
+        { idx: 1, label: "Nama Lengkap" },
+        { idx: 3, label: "NIP" },
+        { idx: 4, label: "Nomor Karpeg" },
+        { idx: 5, label: "Golongan" },
+        { idx: 6, label: "Pangkat" },
+        { idx: 12, label: "Unit Kerja"},
+        { idx: 13, label: "Jabatan Fungsional" },
+        { idx: 14, label: "Status" },
+        { idx: 19, label: "Pengangkatan" },
+        { idx: 20, label: "Tahun PJL / Penerimaan" },
+        { idx: 21, label: "TMT Jabatan" },
+        { idx: 22, label: "Tanggal Pelantikan" }
     ],
     training: [
         { section: "Penjenjangan Pertama", fields: [{ idx: 23, label: "Pelatihan" }, { idx: 24, label: "Hasil" }] },
@@ -169,15 +178,34 @@ function renderProfileUI(type) {
 }
 
 function renderRow(label, value) {
+    // Fungsi pembantu untuk mengubah format tanggal di dalam baris
+    const formatTanggal = (val) => {
+        if (!val || val === '-') return '-';
+
+        // Deteksi apakah value adalah format tanggal ISO (seperti 2023-11-26T17:00...)
+        const isDate = typeof val === 'string' && val.includes('T') && val.includes(':') && !isNaN(Date.parse(val));
+
+        if (isDate) {
+            const d = new Date(val);
+            // Menggunakan format Indonesia (dd MMMM yyyy)
+            return d.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+        return val; // Kembalikan nilai asli jika bukan tanggal
+    };
+
+    const cleanValue = formatTanggal(value);
+
     return `<div class="list-group-item p-3 border-light border-0 border-bottom">
                 <div class="row align-items-center">
-                    <!-- Ukuran font label naik ke 13px dan warna lebih terang -->
                     <div class="col-5 text-muted fw-bold text-uppercase" style="font-size:13px; letter-spacing: 0.5px;">
                         ${label}
                     </div>
-                    <!-- Ukuran font isi data naik ke 15px -->
-                    <div class="col-7 fw-bold" style="font-size:15px">
-                        ${value || '-'}
+                    <div class="col-7 fw-bold" style="font-size:15px; color: var(--text-main)!important;">
+                        ${cleanValue}
                     </div>
                 </div>
             </div>`;
@@ -246,8 +274,16 @@ function showPage(id) {
     document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
     const target = document.getElementById(`page-${id}`);
     if(target) target.style.display = 'block';
+
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.getElementById(`nav-${id}`)?.classList.add('active');
+    const activeNav = document.getElementById(`nav-${id}`);
+    if(activeNav) activeNav.classList.add('active');
+
+    // TAMBAHKAN INI: Jika yang dibuka adalah halaman entry, jalankan auto-fill
+    if (id === 'entry') {
+        autoFillUsulanForm();
+    }
+
     if(window.innerWidth < 992) document.body.classList.remove('sidebar-open');
 }
 
@@ -287,4 +323,42 @@ async function fetchUsersToTable() {
 function showAnalitikDev() { 
     showPage('analitik'); 
     document.getElementById('analitikDataDisplay').innerHTML = `<div class="alert alert-info p-5 text-center" style="border-radius:20px"><h4>${t('nav_analitik')}</h4>${t('dev_mode')}</div>`; 
+}
+
+function formatAuto(val) {
+    if (!val || val === '-') return '-';
+    // Jika formatnya tanggal ISO (ada huruf T dan Z)
+    if (typeof val === 'string' && val.includes('T') && val.includes('Z')) {
+        const d = new Date(val);
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    return val;
+}
+
+async function autoFillUsulanForm() {
+    const inputNama = document.getElementById('entNama');
+    const inputNip = document.getElementById('entNip');
+
+    if (inputNama) inputNama.value = userData.name;
+
+    // Cek apakah data profil sudah ada di memori (cache)
+    if (cachedProfileData && cachedProfileData.pak && cachedProfileData.pak.values) {
+        // Berdasarkan mapping Anda: NIP ada di Index 3
+        const nipVal = cachedProfileData.pak.values[3];
+        if (inputNip) inputNip.value = nipVal || "";
+    } else {
+        // Jika belum ada di cache (misal user baru login langsung ke menu usulan)
+        // Kita tarik datanya secara manual
+        try {
+            const res = await fetch(`${API_URL}?action=getProfile&email=${userData.email}`);
+            const result = await res.json();
+            if (result.status === "success") {
+                cachedProfileData = result.data;
+                const nipVal = cachedProfileData.pak.values[3];
+                if (inputNip) inputNip.value = nipVal || "";
+            }
+        } catch (e) {
+            console.log("Auto-fill NIP gagal: Koneksi bermasalah");
+        }
+    }
 }
