@@ -421,3 +421,17 @@ body.dark .q-card label {
 body.dark .form-control::placeholder {
     color: #64748b !important;
 }
+
+/* Gaya untuk input yang salah */
+.gform-input.is-invalid {
+    border-bottom: 2px solid #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.05) !important;
+}
+
+/* Tulisan pesan error merah kecil */
+.error-msg {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none; /* Sembunyi secara default */
+}
