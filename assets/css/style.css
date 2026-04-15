@@ -263,7 +263,7 @@ body.dark .text-muted {
 
 /* Pastikan Ikon Sidebar memiliki ukuran dan warna yang benar */
 .nav-link i {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     min-width: 25px; /* Beri ruang agar teks tidak menempel ke ikon */
     display: inline-block;
 }

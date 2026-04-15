@@ -362,3 +362,58 @@ async function autoFillUsulanForm() {
         }
     }
 }
+
+
+// 1. Fungsi memunculkan/menyembunyikan pertanyaan tambahan
+function toggleConditionalQuestions(value) {
+    const div = document.getElementById('conditionalQuestions');
+    if (value === 'Belum ada') {
+        div.style.display = 'block';
+        // Tambahkan atribut required secara dinamis agar validasi jalan
+        document.getElementById('entPredikat2023').required = true;
+        document.getElementById('entLink2023').required = true;
+        document.getElementById('entPredikat2024').required = true;
+        document.getElementById('entLink2024').required = true;
+    } else {
+        div.style.display = 'none';
+        document.getElementById('entPredikat2023').required = false;
+        document.getElementById('entLink2023').required = false;
+        document.getElementById('entPredikat2024').required = false;
+        document.getElementById('entLink2024').required = false;
+    }
+}
+
+const dataToSubmit = [
+    new Date().toLocaleString('id-ID'),                // A: Timestamp
+    userData.email,                                   // B: Email
+    userData.name,                                    // C: Nama
+    document.getElementById('entNip').value,          // D: NIP Baru
+    document.querySelector('input[name="entUbahPangkat"]:checked').value, // E: Perubahan Pangkat
+    
+    // KOLOM BARU (F): Link SK Pangkat
+    document.getElementById('entLinkSkPangkat').value || "-", 
+    
+    document.querySelector('input[name="entAdaAk"]:checked').value,      // G: Dokumen AK sd 2024
+    
+    // Pertanyaan Tambahan (H s/d K)
+    document.getElementById('entPredikat2023').value || "-",
+    document.getElementById('entLink2023').value || "-",
+    document.getElementById('entPredikat2024').value || "-",
+    document.getElementById('entLink2024').value || "-"
+];
+
+
+// 1. Fungsi pemicu untuk SK Pangkat
+function togglePangkatConditional(value) {
+    const area = document.getElementById('pangkatConditionalArea');
+    const input = document.getElementById('entLinkSkPangkat');
+    
+    if (value === 'Ya') {
+        area.style.display = 'block';
+        input.required = true;
+    } else {
+        area.style.display = 'none';
+        input.required = false;
+        input.value = ""; // Reset jika user berubah pikiran ke 'Tidak'
+    }
+}

@@ -135,33 +135,116 @@
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm mb-3 q-card">
-                    <div class="card-body p-4">
-                        <label class="form-label fw-bold mb-3">Perubahan pangkat/golongan 1 tahun terakhir? <span class="text-danger">*</span></label>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="entUbahPangkat" value="Ya" id="upYa" required>
-                            <label class="form-check-label" for="upYa">Ya</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="entUbahPangkat" value="Tidak" id="upTidak">
-                            <label class="form-check-label" for="upTidak">Tidak</label>
-                        </div>
-                    </div>
-                </div>
+                <!-- PERTANYAAN 3: PERUBAHAN PANGKAT -->
+<div class="card border-0 shadow-sm mb-3 q-card">
+    <div class="card-body p-4">
+        <label class="form-label fw-bold mb-3">Apakah terdapat perubahan pangkat/golongan dalam kurun waktu 1 tahun terakhir (2025-2026)? <span class="text-danger">*</span></label>
+        <div class="form-check mb-2">
+            <!-- Tambahkan onchange di sini -->
+            <input class="form-check-input" type="radio" name="entUbahPangkat" value="Ya" id="upYa" required onchange="togglePangkatConditional(this.value)">
+            <label class="form-check-label" for="upYa">Ya</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="entUbahPangkat" value="Tidak" id="upTidak" onchange="togglePangkatConditional(this.value)">
+            <label class="form-check-label" for="upTidak">Tidak</label>
+        </div>
+    </div>
+</div>
 
-                <div class="card border-0 shadow-sm mb-3 q-card">
-                    <div class="card-body p-4">
-                        <label class="form-label fw-bold mb-3">Sudah memiliki dokumen AK sd. 2024? <span class="text-danger">*</span></label>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="entAdaAk" value="Sudah ada" id="akAda" required>
-                            <label class="form-check-label" for="akAda">Sudah ada</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="entAdaAk" value="Belum ada" id="akBelum">
-                            <label class="form-check-label" for="akBelum">Belum ada</label>
-                        </div>
-                    </div>
-                </div>
+<!-- KOTAK BERSYARAT 1: SK PANGKAT (Muncul jika Ya) -->
+<div id="pangkatConditionalArea" style="display: none;">
+    <div class="card border-0 shadow-sm mb-3 overflow-hidden" style="border-radius: 10px;">
+        <div class="p-3 text-white fw-bold" style="background: #673ab7;">Perubahan Pangkat/Golongan</div>
+    </div>
+    <div class="card border-0 shadow-sm mb-3 q-card">
+        <div class="card-body p-4">
+            <label class="form-label fw-bold mb-2">SK Pangkat/Golongan terakhir <span class="text-danger">*</span></label>
+            <p class="text-muted small mb-3">Tuliskan link file pada drive penyimpanan online. Apabila file tersebut bersifat restricted, agar dapat diberikan akses ke email: <b>sdmukpbjbps@gmail.com</b></p>
+            <input type="url" id="entLinkSkPangkat" class="form-control gform-input" 
+           placeholder="https://drive.google.com/..." onblur="validateLink('entLinkSkPangkat')">
+           <div id="error-entLinkSkPangkat" class="error-msg">
+        <i class="bi bi-exclamation-circle"></i> Link tidak valid. Pastikan diawali dengan http:// atau https://
+    </div>
+        </div>
+    </div>
+</div>
+
+                <!-- PERTANYAAN 4: DOKUMEN AK -->
+<div class="card border-0 shadow-sm mb-3 q-card">
+    <div class="card-body p-4">
+        <label class="form-label fw-bold mb-3">Apakah sudah memiliki dokumen AK sd. 2024? <span class="text-danger">*</span></label>
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="entAdaAk" value="Sudah ada" id="akAda" required onchange="toggleConditionalQuestions(this.value)">
+            <label class="form-check-label" for="akAda">Sudah ada</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="entAdaAk" value="Belum ada" id="akBelum" onchange="toggleConditionalQuestions(this.value)">
+            <label class="form-check-label" for="akBelum">Belum ada</label>
+        </div>
+    </div>
+</div>
+
+<!-- BAGIAN PERTANYAAN BERSYARAT (Hanya muncul jika Belum Ada) -->
+<div id="conditionalQuestions" style="display: none;">
+    <!-- Header Ungu Section -->
+    <div class="card border-0 shadow-sm mb-3 overflow-hidden" style="border-radius: 10px;">
+        <div class="p-3 text-white fw-bold" style="background: #673ab7;">Penilaian Kinerja 2023 - 2024</div>
+    </div>
+
+    <!-- Predikat 2023 -->
+    <div class="card border-0 shadow-sm mb-3 q-card">
+        <div class="card-body p-4">
+            <label class="form-label fw-bold mb-3">Predikat Kinerja 2023 <span class="text-danger">*</span></label>
+            <select id="entPredikat2023" class="form-select gform-input">
+                <option value="" selected disabled>Pilih</option>
+                <option value="Sangat Baik">Sangat Baik</option>
+                            <option value="Baik">Baik</option>
+                            <option value="Butuh Perbaikan">Butuh Perbaikan</option>
+                            <option value="Kurang">Kurang</option>
+                            <option value="Sangat Kurang">Sangat Kurang</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Link 2023 -->
+    <div class="card border-0 shadow-sm mb-3 q-card">
+        <div class="card-body p-4">
+            <label class="form-label fw-bold mb-2">File Evaluasi Kinerja 2023 (Link Drive) <span class="text-danger">*</span></label>
+            <p class="text-muted small mb-3">Tuliskan link file pada drive penyimpanan online. Apabila file tersebut bersifat restricted, agar dapat diberikan akses ke email: <b>sdmukpbjbps@gmail.com</b></p>
+            <input type="url" id="entLink2023" class="form-control gform-input" placeholder="https://drive.google.com/...">
+            <div id="error-entLinkSkPangkat" class="error-msg">
+        <i class="bi bi-exclamation-circle"></i> Link tidak valid. Pastikan diawali dengan http:// atau https://
+    </div>
+        </div>
+    </div>
+
+    <!-- Predikat 2024 -->
+    <div class="card border-0 shadow-sm mb-3 q-card">
+        <div class="card-body p-4">
+            <label class="form-label fw-bold mb-3">Predikat Kinerja 2024 <span class="text-danger">*</span></label>
+            <select id="entPredikat2024" class="form-select gform-input">
+                <option value="" selected disabled>Pilih</option>
+                <option value="Sangat Baik">Sangat Baik</option>
+                            <option value="Baik">Baik</option>
+                            <option value="Butuh Perbaikan">Butuh Perbaikan</option>
+                            <option value="Kurang">Kurang</option>
+                            <option value="Sangat Kurang">Sangat Kurang</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Link 2024 -->
+    <div class="card border-0 shadow-sm mb-3 q-card">
+        <div class="card-body p-4">
+            <label class="form-label fw-bold mb-2">File Evaluasi Kinerja 2024 (Link Drive) <span class="text-danger">*</span></label>
+            <p class="text-muted small mb-3">Tuliskan link file pada drive penyimpanan online. Apabila file tersebut bersifat restricted, agar dapat diberikan akses ke email: <b>sdmukpbjbps@gmail.com</b></p>
+            <input type="url" id="entLink2024" class="form-control gform-input" placeholder="https://drive.google.com/...">
+            <div id="error-entLinkSkPangkat" class="error-msg">
+        <i class="bi bi-exclamation-circle"></i> Link tidak valid. Pastikan diawali dengan http:// atau https://
+    </div>
+        </div>
+    </div>
+</div>
 
                 <div class="card border-0 shadow-sm mb-3 q-card">
                     <div class="card-body p-4">
@@ -181,6 +264,9 @@
                     <div class="card-body p-4">
                         <label class="form-label fw-bold mb-2">File Evaluasi Kinerja (Link Drive) <span class="text-danger">*</span></label>
                         <input type="url" id="entLinkFile" class="form-control gform-input" placeholder="https://drive.google.com/..." required>
+                        <div id="error-entLinkFile" class="error-msg">
+        <i class="bi bi-exclamation-circle"></i> Link tidak valid. Pastikan diawali dengan http:// atau https://
+    </div>
                     </div>
                 </div>
 
