@@ -85,7 +85,7 @@ const customProfileFields = {
     training: [
         { section: "Penjenjangan Pertama", fields: [{ idx: 2, label: "Pelatihan" }, { idx: 3, label: "Hasil" }] },
         { section: "Penjenjangan Muda", fields: [{ idx: 4, label: "Pelatihan" }, { idx: 5, label: "Ujikom" }, { idx: 6, label: "Hasil" }] },
-        { section: "Penjenjangan Madya", fields: [{ idx: 7, label: "Pelatihan" }, { idx: 7, label: "Ujikom" }, { idx: 9, label: "Hasil" }] }
+        { section: "Penjenjangan Madya", fields: [{ idx: 7, label: "Pelatihan" }, { idx: 8, label: "Ujikom" }, { idx: 9, label: "Hasil" }] }
     ],
     experience: [
         { section: "Paket Konstruksi 2022-2024", fields: [{ idx: 2, label: "Seleksi" }, { idx: 3, label: "Tender" }, { idx: 4, label: "Pendampingan" }] },
@@ -319,7 +319,12 @@ function renderProfileUI(type) {
     const d = (specificData && specificData.values) ? specificData.values : [];
     const fieldsToShow = customProfileFields[type] || [];
 
-    let labelExtra = type === 'training' ? `<div class="p-3 border-bottom"><h6 class="fw-800 mb-0"><i class="bi bi-award-fill me-2 text-success"></i>Keikutsertaan Pelatihan dan Uji Kompetensi</h6></div>` : "";
+    let labelExtra = type === 'training' ? `
+    <div class="p-3 border-bottom">
+    <h5 class="fw-800 mb-0" style="font-size: 1.25rem; color: var(--text-main) !important;">
+    <i class="bi bi-award-fill me-2 text-success"></i>Keikutsertaan Pelatihan dan Uji Kompetensi
+    </h5>
+    </div>` : "";
 
     let html = `
         <div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius:20px;">
@@ -331,7 +336,7 @@ function renderProfileUI(type) {
 
     fieldsToShow.forEach(item => {
         if (item.section) {
-            html += `<div class="bg-light p-2 px-3 fw-bold small text-primary border-bottom border-top" style="letter-spacing:1px; font-size: 11px;">
+            html += `<div class="bg-light p-2 px-3 fw-bold small text-primary border-bottom border-top" style="letter-spacing:1px; font-size: 16px;">
                         <i class="bi bi-layers-fill me-1"></i> ${item.section.toUpperCase()}
                      </div>`;
             item.fields.forEach(f => { html += renderRow(f.label, d[f.idx]); });
