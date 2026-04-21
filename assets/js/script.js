@@ -85,7 +85,7 @@ if (userData.picture) {
 const customProfileFields = {
     pak: [
         { idx: 1, label: "Nama Lengkap" }, { idx: 2, label: "NIP" }, { idx: 3, label: "Nomor Karpeg" },
-        { idx: 4, label: "Golongan" }, { idx: 5, label: "Pangkat" }, { idx: 11, label: "Unit Kerja"},
+        { idx: 4, label: "Golongan" }, { idx: 5, label: "Pangkat" },{ idx: 6, label: "TMT Pangkat" },{ idx: 7, label: "Tempat Lahir" },{ idx: 8, label: "Tanggal Lahir" }, { idx: 9, label: "Jenis Kelamin" },{ idx: 11, label: "Unit Kerja"},
         { idx: 12, label: "Jabatan Fungsional" }, { idx: 13, label: "Status" }, { idx: 18, label: "Pengangkatan" },
         { idx: 19, label: "Tahun PJL / Penerimaan" }, { idx: 20, label: "TMT Jabatan" }, { idx: 21, label: "Tanggal Pelantikan" }
     ],
