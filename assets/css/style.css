@@ -457,3 +457,71 @@ body.dark .form-control::placeholder {
     opacity: 0;
     visibility: hidden;
 }
+
+/* Styling Seksi Tentang Aplikasi */
+.about-app-container {
+    color: #475569; /* Warna teks abu-abu gelap profesional */
+    line-height: 1.6;
+}
+
+.about-app-container h3 {
+    color: #1e293b;
+    position: relative;
+}
+
+/* Styling List Custom (Huruf a, b, c, d) */
+.about-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.about-list li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.about-list li::before {
+    content: counter(item) ". "; /* Menggunakan counter untuk huruf */
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    color: #16a34a; /* Warna hijau aksen */
+}
+
+/* Mengatur counter agar menjadi huruf kecil a, b, c... */
+.about-list {
+    counter-list: lowercase-alpha; 
+}
+/* Alternatif jika counter-list tidak jalan di browser lama, 
+   bisa gunakan list-style-type: lower-alpha; tapi butuh padding */
+
+/* Styling Tombol Hijau */
+.btn-about {
+    background-color: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-about:hover {
+    background-color: #15803d;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+/* Styling Gambar */
+.about-img {
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+}

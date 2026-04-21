@@ -225,27 +225,31 @@ function renderSidebar() {
 }
 
 function showPage(id) {
-    // 1. Sembunyikan semua halaman & tampilkan target
+    // 1. Tampilkan halaman yang dituju
     document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
     const target = document.getElementById(`page-${id}`);
     if(target) target.style.display = 'block';
 
-    // 2. RESET HIGHLIGHT: Hilangkan semua class active dari menu utama dan submenu
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.querySelectorAll('.submenu a').forEach(a => a.classList.remove('active'));
+    // 2. FORCE RESET: Hapus SEMUA highlight di sidebar tanpa terkecuali
+    // Ini memastikan tidak ada menu yang "tertinggal" status active-nya
+    document.querySelectorAll('.nav-link').forEach(el => {
+        el.classList.remove('active');
+    });
+    document.querySelectorAll('.submenu a').forEach(el => {
+        el.classList.remove('active');
+    });
 
-    // 3. LOGIKA HIGHLIGHT MENU UTAMA & SUBMENU
-    if (id === 'dashboard') {
-        document.getElementById('nav-dashboard')?.classList.add('active');
-    } 
-    else if (id === 'profile') {
-        document.getElementById('nav-profile')?.classList.add('active');
-    } 
-    else if (id.startsWith('entry-')) {
-        // Highlight Parent: Usulan AK
-        document.getElementById('nav-entry')?.classList.add('active');
-        
-        // Highlight Sub-menu spesifik berdasarkan ID halaman
+    // 3. LOGIKA HIGHLIGHT MENU UTAMA (Hanya untuk menu tunggal)
+    // Kita hanya izinkan menu-menu ini untuk menjadi hijau
+    const allowedSingleMenus = ['dashboard', 'pengguna', 'pengaturan', 'analitik'];
+    
+    if (allowedSingleMenus.includes(id)) {
+        const navEl = document.getElementById(`nav-${id}`);
+        if (navEl) navEl.classList.add('active');
+    }
+
+    // 4. HIGHLIGHT KHUSUS SUB-MENU USULAN AK
+    if (id.startsWith('entry-')) {
         if(id === 'entry-form') {
             const link = Array.from(document.querySelectorAll('#subEntry a')).find(a => a.innerText.includes('Form Usulan AK'));
             if(link) link.classList.add('active');
@@ -253,14 +257,9 @@ function showPage(id) {
             const link = Array.from(document.querySelectorAll('#subEntry a')).find(a => a.innerText.includes('Draf Penetapan AK'));
             if(link) link.classList.add('active');
         }
-    } 
-    else {
-        // Untuk menu single seperti Analitik, Pengguna, Pengaturan
-        const activeNav = document.getElementById(`nav-${id}`);
-        if(activeNav) activeNav.classList.add('active');
     }
 
-    // 4. TRIGGER FUNGSI HALAMAN (Tetap dipertahankan)
+    // 5. TRIGGER FUNGSI HALAMAN
     if (id === 'entry-form') autoFillUsulanForm();
     if (id === 'entry-pdf') loadUserPDF(); 
     if (id === 'dashboard') renderDashboardCards();
@@ -336,15 +335,27 @@ function renderProfileSelectorIfAdmin() {
 }
 
 async function loadProfileData(type) {
-    showPage('profile');
+    // Panggil showPage untuk mengganti konten halaman
+    showPage('profile'); 
+    
+    // PENGAMAN EKSTRA: Pastikan sekali lagi nav-profile TIDAK active
+    const navProfile = document.getElementById('nav-profile');
+    if (navProfile) {
+        navProfile.classList.remove('active');
+    }
+
     const area = document.getElementById('profileDetailArea');
-
-    document.querySelectorAll('.submenu a').forEach(a => a.classList.remove('active'));
+    
+    // Hapus highlight dari semua sub-menu profil sebelum memberikan yang baru
+    document.querySelectorAll('#subProfil a').forEach(a => a.classList.remove('active'));
+    
+    // Berikan highlight hanya pada sub-menu yang diklik
     const subLink = document.getElementById(`sub-${type}`);
-    if(subLink) subLink.classList.add('active');
-    document.getElementById(`sub-${type}`)?.classList.add('active');
-    document.getElementById('nav-profile').classList.add('active');
+    if(subLink) {
+        subLink.classList.add('active');
+    }
 
+    // --- Sisa kode loading data Anda ---
     const cached = getCachedProfile(viewingEmail);
     if (!cached) {
         area.innerHTML = `<div class="p-5 text-center"><div class="spinner-border text-primary"></div><p class="mt-2">${t('loading')}</p></div>`;
