@@ -525,3 +525,224 @@ body.dark .form-control::placeholder {
     height: auto;
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
 }
+
+
+/* --- LOGIN PAGE MODERN --- */
+.login-body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #f8fafc;
+}
+
+.login-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* SISI KIRI: VISUAL */
+.login-visual {
+    flex: 1.2;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #166534 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: white;
+    overflow: hidden;
+}
+
+.visual-content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+}
+
+.brand-badge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.visual-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.visual-title span {
+    color: #4ade80; /* Hijau cerah untuk highlight */
+}
+
+.visual-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.visual-footer {
+    display: flex;
+    gap: 24px;
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* Dekorasi Lingkaran Background */
+.circle-deco {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    opacity: 0.4;
+}
+
+.circle-1 {
+    width: 400px;
+    height: 400px;
+    background: #4ade80;
+    top: -100px;
+    right: -100px;
+}
+
+.circle-2 {
+    width: 300px;
+    height: 300px;
+    background: #60a5fa;
+    bottom: -50px;
+    left: -50px;
+}
+
+/* SISI KANAN: FORM */
+.login-form-section {
+    flex: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 40px;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 420px;
+    animation: slideUp 0.6s ease-out;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-logo {
+    width: 64px;
+    height: 64px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.1);
+}
+
+.form-header h2 {
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.form-header p {
+    color: #64748b;
+    font-size: 15px;
+}
+
+/* Google Button Styling */
+.google-btn-container {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Overwrite style Google Button (jika memungkinkan via CSS) */
+#buttonDiv iframe {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+    transition: transform 0.2s ease;
+}
+
+#buttonDiv iframe:hover {
+    transform: translateY(-2px);
+}
+
+.login-error {
+    background-color: #fef2f2;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 24px;
+    border: 1px solid #fee2e2;
+}
+
+/* Info Box / Catatan */
+.info-box {
+    display: flex;
+    gap: 12px;
+    background-color: #f8fafc;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    align-items: flex-start;
+}
+
+.info-icon {
+    color: #3b82f6;
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.info-text {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.info-text strong {
+    color: #1e293b;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .login-visual { display: none; }
+    .login-form-section { flex: 1; }
+}

@@ -34,23 +34,58 @@
         }
     </style>
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-    <!-- ... sisa isi body sama seperti sebelumnya ... -->
-    <div class="card shadow-lg border-0 text-center login-card">
-        <div class="card-body p-5">
-            <div class="login-icon mb-3 mx-auto"><i class="bi bi-shield-lock-fill"></i></div>
-            <h3 class="fw-800 text-primary mb-2">Sistem Informasi PAK</h3>
-            <h3 class="fw-800 text-primary mb-2">UKPBJ BPS</h3>
-            <p class="text-muted small mb-4">Masuk praktis menggunakan akun Google Anda</p>
-            
-            <div id="buttonDiv" class="d-flex justify-content-center"></div>
-            <div id="loginStatus" class="mt-3 small text-danger" style="display:none;">
-                Email Anda tidak terdaftar dalam sistem.
+<body class="login-body">
+    <div class="login-container">
+        <!-- SISI KIRI: VISUAL & BRANDING -->
+        <div class="login-visual">
+            <div class="visual-content">
+                <div class="brand-badge">UKPBJ BPS</div>
+                <h1 class="visual-title">Sistem Informasi  <br><span>Pengelolaan AK</span></h1>
+                <p class="visual-subtitle">Sistem Informasi PAK hadir untuk mempermudah monitoring dan administrasi Angka Kredit Pejabat Fungsional PPBJ.</p>
+                
+                <div class="visual-footer">
+                    <div class="footer-item">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Aman & Terenkripsi</span>
+                    </div>
+                    <div class="footer-item">
+                        <i class="bi bi-cloud-check"></i>
+                        <span>Sinkronisasi Cloud</span>
+                    </div>
+                </div>
             </div>
+            <!-- Elemen Dekorasi Background -->
+            <div class="circle-deco circle-1"></div>
+            <div class="circle-deco circle-2"></div>
+        </div>
 
-            <div class="mt-4 p-3 bg-light rounded-3 small border text-start">
-                <div class="fw-bold text-primary mb-1"><i class="bi bi-info-circle"></i> Catatan:</div>
-                Pastikan email Google Anda sudah didaftarkan oleh Admin! 
+        <!-- SISI KANAN: LOGIN FORM -->
+        <div class="login-form-section">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="login-logo">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h2>Selamat Datang</h2>
+                    <p>Silakan masuk untuk mengakses dashboard Anda</p>
+                </div>
+
+                <div id="buttonDiv" class="google-btn-container"></div>
+                
+                <div id="loginStatus" class="login-error" style="display:none;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Email Anda tidak terdaftar dalam sistem.
+                </div>
+
+                <div class="info-box">
+                    <div class="info-icon">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </div>
+                    <div class="info-text">
+                        <strong>Catatan Penting:</strong>
+                        <span>Pastikan email Google Anda sudah didaftarkan oleh Admin sebelum mencoba masuk.</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
