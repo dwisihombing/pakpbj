@@ -8,7 +8,7 @@
 // ==========================================
 // Tambahkan default pbj dan pdf agar tidak error saat pertama load
 const userData = JSON.parse(sessionStorage.getItem('userData')) || { role: 'User', name: 'Guest', email: '', picture: '', pbj: '', pdf: '' };
-const API_URL = "https://script.google.com/macros/s/AKfycbyrNYayEmkh4XMHCiRQ951Oz56atgA4bLgHqIvZpp7Vj9fXzDBqlmunpmUS7Lzevvg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyfYgrhKBqrzcsHXOkJj_wqPHf7rgWerpWuPb6eLAlUG0Z-hcUxdPkbAjOfL9lYqLi7/exec";
 
 let state = {
     role: sessionStorage.getItem('activeRole') || userData.role,
@@ -95,7 +95,7 @@ const customProfileFields = {
         { section: "Penjenjangan Madya", fields: [{ idx: 7, label: "Pelatihan" }, { idx: 8, label: "Ujikom" }, { idx: 9, label: "Hasil" }] }
     ],
     experience: [
-        { section: "Paket Konstruksi 2022-2024", fields: [{ idx: 2, label: "Seleksi" }, { idx: 3, label: "Tender" }, { idx: 4, label: "Pendampingan" }] }
+        { section: "Jumlah Paket Konstruksi 2022-2024", fields: [{ idx: 2, label: "Seleksi" }, { idx: 3, label: "Tender" }, { idx: 4, label: "Pendampingan" }] }
     ]
 };
 
@@ -394,13 +394,13 @@ function renderProfileUI(type) {
     const d = (specificData && specificData.values) ? specificData.values : [];
     const fieldsToShow = customProfileFields[type] || [];
 
-    let labelExtra = type === 'training' ? `<div class="p-3 border-bottom"><h6 class="fw-800 mb-0"><i class="bi bi-award-fill me-2 text-success"></i>Keikutsertaan Pelatihan dan Uji Kompetensi</h6></div>` : "";
+    let labelExtra = type === 'training' ? `<div class="p-3 border-bottom"><h5 class="fw-800 mb-0"><i class="bi bi-award-fill me-2 text-success"></i>Keikutsertaan Pelatihan dan Uji Kompetensi</h6></div>` : "";
 
     let html = `<div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius:20px;"><div class="card-header bg-primary text-white p-4 border-0"><h5 class="mb-0 fw-bold text-uppercase">${t('sub_' + type)}</h5><small class="opacity-75">${viewingName}</small></div><div class="card-body p-0">${labelExtra}<div class="list-group list-group-flush">`;
 
     fieldsToShow.forEach(item => {
         if (item.section) {
-            html += `<div class="bg-light p-2 px-3 fw-bold small text-primary border-bottom border-top" style="letter-spacing:1px; font-size: 11px;"><i class="bi bi-layers-fill me-1"></i> ${item.section.toUpperCase()}</div>`;
+            html += `<div class="bg-light p-2 px-3 fw-bold small text-primary border-bottom border-top" style="letter-spacing:1px; font-size: 18px;"><i class="bi bi-layers-fill me-1"></i> ${item.section.toUpperCase()}</div>`;
             item.fields.forEach(f => { html += renderRow(f.label, d[f.idx]); });
         } else {
             html += renderRow(item.label, d[item.idx]);
@@ -499,33 +499,60 @@ function setupEntryForm() {
 // Fungsi yang dipanggil saat user buka menu PDF
 async function loadUserPDF() {
     const viewer = document.getElementById('pdfViewer');
+    const placeholder = document.getElementById('pdfPlaceholder');
     const actionArea = document.getElementById('verifActionArea');
     const doneArea = document.getElementById('verifDoneArea');
     const instruction = document.getElementById('verifInstruction');
 
-    // Tampilkan PDF
-    const pdfUrlRaw = userData.pdf;
-    if (pdfUrlRaw && pdfUrlRaw.includes('drive.google.com')) {
-        const match = pdfUrlRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match) viewer.src = `https://drive.google.com/file/d/${match[1]}/preview`;
-    }
+    if (!viewer) return;
 
-    // CEK STATUS KE SERVER (Kunci permanen jika sudah ada data)
+    // --- STEP 1: RESET & SEMBUNYIKAN SEMUANYA DULU ---
+    viewer.src = "";
+    viewer.style.display = 'none';
+    if (placeholder) placeholder.classList.add('d-none');
+    if (instruction) instruction.style.display = 'none'; // Sembunyikan instruksi biru
+    if (actionArea) actionArea.style.display = 'none';   // Sembunyikan tombol bawah
+    if (doneArea) doneArea.style.display = 'none';       // Sembunyikan kartu sukses
+
     try {
-        const res = await fetch(`${API_URL}?action=addEntry&email=${userData.email}&sheet=Verifikasi+Draf&data=[]`);
-        const result = await res.json();
-        
-        if (result.message && result.message.includes("sudah melakukan verifikasi")) {
-            actionArea.style.display = 'none';
-            instruction.style.display = 'none';
-            doneArea.style.display = 'block';
+        // --- STEP 2: PANGGIL API UNTUK CARI FILE ---
+        const resAuto = await fetch(`${API_URL}?action=getAutoDraft&email=${userData.email}`);
+        const resultAuto = await resAuto.json();
+
+        if (resultAuto.status === "success") {
+            const match = resultAuto.link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) {
+                // JIKA FILE DITEMUKAN:
+                viewer.src = `https://drive.google.com/file/d/${match[1]}/preview`;
+                viewer.style.display = 'block';
+                if (instruction) instruction.style.display = 'block'; // Tampilkan instruksi di atas
+
+                // --- STEP 3: CEK APAKAH SUDAH PERNAH VERIFIKASI ---
+                const resStatus = await fetch(`${API_URL}?action=addEntry&email=${userData.email}&sheet=Verifikasi+Draf&data=[]`);
+                const resultStatus = await resStatus.json();
+                
+                if (resultStatus.message && resultStatus.message.includes("sudah melakukan verifikasi")) {
+                    // Jika sudah pernah isi:
+                    if (actionArea) actionArea.style.display = 'none';
+                    if (instruction) instruction.style.display = 'none'; // Sembunyikan instruksi jika sudah beres
+                    if (doneArea) {
+                        doneArea.innerHTML = renderSuccessCard("Anda sudah pernah mengirimkan kesesuaian dokumen.<br>Silakan hubungi Admin untuk membantu mereset feedback.");
+                        doneArea.style.display = 'block';
+                    }
+                } else {
+                    // Jika belum pernah isi:
+                    if (actionArea) actionArea.style.display = 'block'; // Tampilkan tombol konfirmasi di bawah
+                }
+            }
         } else {
-            actionArea.style.display = 'block';
-            instruction.style.display = 'block';
-            doneArea.style.display = 'none';
+            // --- JIKA FILE TIDAK DITEMUKAN ---
+            // Instruksi dan Tombol akan tetap sembunyi (karena sudah di-reset di Step 1)
+            viewer.style.display = 'none';
+            if (placeholder) placeholder.classList.remove('d-none'); // Munculkan tulisan "Dokumen tidak ditemukan"
         }
+
     } catch (e) {
-        actionArea.style.display = 'block';
+        console.error("Error loading PDF:", e);
     }
 }
 
@@ -683,30 +710,7 @@ function toggleSub(id) {
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
-function loadUserPDF() {
-    const viewer = document.getElementById('pdfViewer');
-    const placeholder = document.getElementById('pdfPlaceholder');
-    const pdfUrlRaw = userData.pdf;
 
-    if (pdfUrlRaw && pdfUrlRaw.includes('drive.google.com')) {
-        // Ekstrak file ID dari berbagai format URL Google Drive
-        const match = pdfUrlRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            const fileId = match[1];
-            const pdfUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-            viewer.src = pdfUrl;
-            viewer.style.display = 'block';
-            placeholder.classList.add('d-none');
-        } else {
-            // Fallback: URL drive tapi format tidak dikenali
-            viewer.style.display = 'none';
-            placeholder.classList.remove('d-none');
-        }
-    } else {
-        viewer.style.display = 'none';
-        placeholder.classList.remove('d-none');
-    }
-}
 
 function hideLoading() {
     const loader = document.getElementById('loading-screen');

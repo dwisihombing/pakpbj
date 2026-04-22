@@ -1,6 +1,6 @@
 // CONFIGURATION
 const GOOGLE_CLIENT_ID = "545994110940-n5dm8uc1beho1pn26giphg9b7ij3r7tl.apps.googleusercontent.com";
-const API_URL = "https://script.google.com/macros/s/AKfycbyrNYayEmkh4XMHCiRQ951Oz56atgA4bLgHqIvZpp7Vj9fXzDBqlmunpmUS7Lzevvg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyfYgrhKBqrzcsHXOkJj_wqPHf7rgWerpWuPb6eLAlUG0Z-hcUxdPkbAjOfL9lYqLi7/exec";
 
 window.onload = function () {
     google.accounts.id.initialize({
