@@ -95,8 +95,7 @@ const customProfileFields = {
         { section: "Penjenjangan Madya", fields: [{ idx: 7, label: "Pelatihan" }, { idx: 8, label: "Ujikom" }, { idx: 9, label: "Hasil" }] }
     ],
     experience: [
-        { section: "Paket Konstruksi 2022-2024", fields: [{ idx: 2, label: "Seleksi" }, { idx: 3, label: "Tender" }, { idx: 4, label: "Pendampingan" }] },
-        { section: "Portofolio", fields: [{ idx: 6, label: "Portofolio Madya JK" }] }
+        { section: "Paket Konstruksi 2022-2024", fields: [{ idx: 2, label: "Seleksi" }, { idx: 3, label: "Tender" }, { idx: 4, label: "Pendampingan" }] }
     ]
 };
 
@@ -191,34 +190,54 @@ function renderSidebar() {
     const canSeeUsulan = isAdmin || state.unitKerja === 'UKPBJ';
 
     menu.innerHTML = `
-        <a class="nav-link" id="nav-dashboard" onclick="showPage('dashboard')"><i class="bi bi-house-door-fill"></i> <span>${t('nav_dash')}</span></a>
+        <a class="nav-link" id="nav-dashboard" onclick="showPage('dashboard')">
+            <i class="bi bi-house-door-fill"></i> <span>${t('nav_dash')}</span>
+        </a>
         
         <div class="nav-item">
             <a class="nav-link d-flex align-items-center" id="nav-profile" onclick="toggleSub('subProfil')">
-                <i class="bi bi-person-circle"></i> <span>${t('nav_profile')}</span><i class="bi bi-chevron-down ms-auto small"></i>
+                <i class="bi bi-person-circle"></i> <span>${t('nav_profile')}</span>
+                <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
             <div id="subProfil" class="submenu shadow-sm" style="display:none">
-                <a href="javascript:void(0)" id="sub-pak" onclick="loadProfileData('pak')">${t('sub_pak')}</a>
-                <a href="javascript:void(0)" id="sub-training" onclick="loadProfileData('training')">${t('sub_training')}</a>
-                <a href="javascript:void(0)" id="sub-experience" onclick="loadProfileData('experience')">${t('sub_experience')}</a>
+                <!-- ICON UNTUK PROFIL -->
+                <a href="javascript:void(0)" id="sub-pak" onclick="loadProfileData('pak')">
+                    <i class="bi bi-person-badge-fill me-2"></i> ${t('sub_pak')}
+                </a>
+                <a href="javascript:void(0)" id="sub-training" onclick="loadProfileData('training')">
+                    <i class="bi bi-mortarboard-fill me-2"></i> ${t('sub_training')}
+                </a>
+                <a href="javascript:void(0)" id="sub-experience" onclick="loadProfileData('experience')">
+                    <i class="bi bi-briefcase-fill me-2"></i> ${t('sub_experience')}
+                </a>
             </div>
         </div>
 
         ${canSeeUsulan ? `
             <div class="nav-item">
                 <a class="nav-link d-flex align-items-center" id="nav-entry" onclick="toggleSub('subEntry')">
-                    <i class="bi bi-plus-circle-fill"></i> <span>${t('nav_entry')}</span><i class="bi bi-chevron-down ms-auto small"></i>
+                    <i class="bi bi-plus-circle-fill"></i> <span>Usulan AK</span>
+                    <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
                 <div id="subEntry" class="submenu shadow-sm" style="display:none">
-                    <a href="javascript:void(0)" onclick="showPage('entry-form')">Form Usulan AK</a>
-                    <a href="javascript:void(0)" onclick="showPage('entry-pdf')">Draf Penetapan AK</a>
+                    <!-- ICON UNTUK USULAN -->
+                    <a href="javascript:void(0)" onclick="showPage('entry-form')">
+                        <i class="bi bi-file-earmark-plus-fill me-2"></i> Form Usulan AK
+                    </a>
+                    <a href="javascript:void(0)" onclick="showPage('entry-pdf')">
+                        <i class="bi bi-file-earmark-check-fill me-2"></i> Draf Penetapan AK
+                    </a>
                 </div>
             </div>
         ` : ''}
 
         ${isAdmin ? `
-            <a class="nav-link" id="nav-analitik" onclick="showAnalitikDev()"><i class="bi bi-bar-chart-fill"></i> <span>${t('nav_analitik')}</span></a>
-            <a class="nav-link" id="nav-pengaturan" onclick="showPage('pengaturan')"><i class="bi bi-gear-fill"></i> <span>${t('nav_set')}</span></a>
+            <a class="nav-link" id="nav-analitik" onclick="showAnalitikDev()">
+                <i class="bi bi-bar-chart-fill"></i> <span>${t('nav_analitik')}</span>
+            </a>
+            <a class="nav-link" id="nav-pengaturan" onclick="showPage('pengaturan')">
+                <i class="bi bi-gear-fill"></i> <span>${t('nav_set')}</span>
+            </a>
         ` : ''}
     `;
 }

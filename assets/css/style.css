@@ -746,3 +746,14 @@ body.dark .form-control::placeholder {
     .login-visual { display: none; }
     .login-form-section { flex: 1; }
 }
+
+.submenu a {
+    display: flex;
+    align-items: center;
+    padding-left: 45px !important; /* Menyesuaikan agar sejajar dengan teks menu utama */
+}
+
+.submenu a i {
+    font-size: 0.9rem; /* Ukuran icon sub-menu sedikit lebih kecil */
+    opacity: 0.8;
+}
