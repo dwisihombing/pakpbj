@@ -693,9 +693,21 @@ function renderDashboardCards() {
         'dash-predikat-2023': 29, 'dash-konversi-2023': 32, 'dash-predikat-2024': 35, 'dash-akumulasi-2024': 39, 
         'dash-predikat-2025': 44, 'dash-akumulasi-2025': 48
     };
+
     for (const [elId, idx] of Object.entries(dashFields)) {
         const el = document.getElementById(elId);
-        if (el) el.textContent = d[idx] || '—';
+        if (el) {
+            let val = d[idx] || '—';
+
+            
+            if (val !== '—' && val !== '' && !isNaN(val)) {
+                if (elId.includes('ak') || elId.includes('konversi') || elId.includes('akumulasi')) {
+                    val = Math.floor(Number(val));
+                }
+            }
+
+            el.textContent = val;
+        }
     }
 }
 
